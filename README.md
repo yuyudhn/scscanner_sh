@@ -1,4 +1,4 @@
-# scscanner- Massive Status Code Scanner
+# scscanner - Massive Status Code Scanner
 scscanner is tool to read website status code response from the lists.
 
 ## Usage
