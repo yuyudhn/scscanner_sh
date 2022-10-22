@@ -3,7 +3,15 @@ scscanner is tool to read website status code response from the lists.
 
 ## Usage
 ```
-bash scscanner.sh list.txt
+asuka@evangelion:~$ bash check.sh -h
+scscanner - Massive Status Code Scanner
+Codename : EVA02
+
+Example: bash check.sh -l domain.txt -t 30
+options:
+-l     Files contain lists of domain.
+-t     Adjust multi process. Default is 15
+-h     Print this Help.
 ```
 
 ## Screenshot
