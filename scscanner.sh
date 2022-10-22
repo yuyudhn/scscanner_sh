@@ -5,13 +5,9 @@ echo -e "
 scscanner - Massive Status Code Scanner
 Codename : EVA02\n"
 
-# Colors 
-red="\033[0;31m"    # Error / Issues
-green="\033[0;32m"  # Successful
-reset="\033[0m"     # Normal
-
 # Variable
 process=15 # Default multi-process
+#domainlists=domainlist.txt # Default domain list
 useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
 
 # Function
@@ -28,17 +24,7 @@ showHelp()
 
 statuscode()
 {
-    curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists
-}
-statusresult(){
-    if [[ $(statuscode) == '200' ]]; then
-	 	echo -e "${green}[$(statuscode)]${reset} - $hostlists"
-    elif
-        [[ $(statuscode) == '403' ]]; then
-	 	echo -e "${red}[$(statuscode)]${reset} - $hostlists"
-  	else
- 		echo "[$(statuscode)] - $hostlists"
-    fi
+    curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists" --silent --output /dev/null $hostlists
 }
 if [ -z "$1" ]; then
     showHelp
@@ -74,7 +60,7 @@ shift "$((OPTIND-1))"
 [ ! -f $domainlists ] && echo "Domain list not found. Check your file path!" && exit 1
 # Do the jobs
 while read hostlists; do
-    statusresult &
+    statuscode &
     background=( $(jobs -p) )
     if (( ${#background[@]} == process )); then
         wait -n
