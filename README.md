@@ -20,7 +20,7 @@ options:
 
 # To do List
 - [x] Add multi-processing
-- [ ] Add silent mode options
-- [ ] Add filter status code options
+- [x] Add filter status code options
+- [ ] Get title from page
 
 Feel free to contribute if you want to improve this tools.
