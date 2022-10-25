@@ -16,18 +16,28 @@ showHelp()
    echo "options:"
    echo "-l     Files contain lists of domain."
    echo "-t     Adjust multi process. Default is 15"
+   echo "-f     Filter status code."
+   echo "-o     Save to file."
    echo "-h     Print this Help."
    echo
 }
 
 statuscode()
 {
-    if [[ -z $filter ]]; then
-        curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null $hostlists
-    else
+    if [[ $saved == 1 ]]; then
         req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
         if [[ $req == $filter ]]; then
             echo "[${req}] - $hostlists"
+            echo $hostlists >> $req-$output
+        fi
+    else
+        if [ -z $filter ]; then
+            curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null $hostlists
+        else
+            req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
+            if [[ $req == $filter ]]; then
+                echo "[${req}] - $hostlists"
+            fi
         fi
     fi
 }
@@ -35,7 +45,7 @@ if [ -z "$1" ] || [[ ! $@ =~ ^\-.+ ]]; then
     showHelp
     exit 0
 fi
-while getopts ":hl:t:f:" opt; do
+while getopts ":hl:t:f:o:" opt; do
     case $opt in
         h)  showHelp
             exit 0
@@ -54,6 +64,8 @@ while getopts ":hl:t:f:" opt; do
             fi
             filter=$OPTARG
             ;;
+        o)  output=$OPTARG
+            ;;
         \?) echo "invalid option: -$OPTARG"
             exit 1
             ;;
@@ -64,12 +76,22 @@ while getopts ":hl:t:f:" opt; do
 done
 shift "$((OPTIND-1))"
 if [ -z "$domainlists" ] || [ ! -f "$domainlists" ]; then
-        echo "Please provide valid domain list file." >&2
+    echo "Please provide valid domain list file." >&2
+    exit 1
+fi
+if [ -z $output ]; then
+    saved=0
+else
+    if [ -z $filter ]; then
+        echo 'if you using -o (output), -f is mandatory (filter)'
         exit 1
+    else
+        saved=1
+    fi
 fi
 # Do the jobs
 while read hostlists; do
-    statuscode &
+    statuscode $saved &
     background=( $(jobs -p) )
     if (( ${#background[@]} == process )); then
         wait -n
