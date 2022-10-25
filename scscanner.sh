@@ -28,8 +28,6 @@ statuscode()
         req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
         if [[ $req == $filter ]]; then
             echo "[${req}] - $hostlists"
-        else
-            echo "[${req}] - $hostlists"
         fi
     fi
 }
