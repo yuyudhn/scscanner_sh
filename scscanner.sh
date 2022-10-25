@@ -22,13 +22,22 @@ showHelp()
 
 statuscode()
 {
-    curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null $hostlists
+    if [[ -z $filter ]]; then
+        curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null $hostlists
+    else
+        req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
+        if [[ $req == $filter ]]; then
+            echo "[${req}] - $hostlists"
+        else
+            echo "[${req}] - $hostlists"
+        fi
+    fi
 }
 if [ -z "$1" ] || [[ ! $@ =~ ^\-.+ ]]; then
     showHelp
     exit 0
 fi
-while getopts ":hl:t:" opt; do
+while getopts ":hl:t:f:" opt; do
     case $opt in
         h)  showHelp
             exit 0
@@ -41,12 +50,18 @@ while getopts ":hl:t:" opt; do
             fi
             process=$OPTARG
             ;;
+        f)  if [[ ! "$OPTARG" =~ ^[0-9]+$ ]] && [[ ! $OPTARG -gt 0 ]]; then
+            echo "Error: invalid filter value"
+            exit 1 # failure
+            fi
+            filter=$OPTARG
+            ;;
         \?) echo "invalid option: -$OPTARG"
             exit 1
             ;;
         :)  echo "option -$OPTARG requires an argument."
             exit 1
-            ;;    
+            ;;
     esac
 done
 shift "$((OPTIND-1))"
