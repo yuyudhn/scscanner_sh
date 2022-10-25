@@ -4,6 +4,12 @@ echo -e "
 scscanner - Massive Status Code Scanner
 Codename : EVA02\n"
 
+if ! command -v curl &> /dev/null
+        then
+        echo "Curl not installed. You must install curl to use this tool."
+        exit 1
+fi
+
 # Variable
 process=15 # Default multi-process
 useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
