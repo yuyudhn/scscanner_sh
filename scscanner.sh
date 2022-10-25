@@ -20,7 +20,7 @@ showHelp()
    # Display Help
    echo "Example: bash $0 -l domain.txt -t 30"
    echo "options:"
-   echo "-l     Files contain lists of domain."
+   echo "-l     File contain lists of domain."
    echo "-t     Adjust multi process. Default is 15"
    echo "-f     Filter status code."
    echo "-o     Save to file."
@@ -58,14 +58,14 @@ while getopts ":hl:t:f:o:" opt; do
             ;;
         l)  domainlists=$OPTARG
             ;;
-        t)  if [[ ! "$OPTARG" =~ ^[0-9]+$ ]] && [[ ! $OPTARG -gt 0 ]]; then
+        t)  if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
             echo "Error: invalid thread value"
             exit 1 # failure
             fi
             process=$OPTARG
             ;;
-        f)  if [[ ! "$OPTARG" =~ ^[0-9]+$ ]] && [[ ! $OPTARG -gt 0 ]]; then
-            echo "Error: invalid filter value"
+        f)  if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
+            echo "Error: invalid status code value"
             exit 1 # failure
             fi
             filter=$OPTARG
