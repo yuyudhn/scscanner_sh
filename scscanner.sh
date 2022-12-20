@@ -1,9 +1,28 @@
 #!/bin/bash
-#Banner
-echo -e "
-scscanner - Massive Status Code Scanner
-Codename : EVA02\n"
 
+# Color definition
+blue="\033[0;34m"
+cyan="\033[0;36m"
+reset="\033[0m"
+red="\033[0;31m"
+green="\033[0;32m"
+orange="\033[0;33m"
+bold="\033[1m"
+b_green="\033[1;32m"
+b_red="\033[1;31m"
+b_orange="\033[1;33m"
+
+#Banner   
+cat << "EOF"                                                   
+  ______ ____   ______ ____ _____    ____   ___________ 
+ /  ___// ___\ /  ___// ___\\__  \  /    \_/ __ \_  __ \
+ \___ \\  \___ \___ \\  \___ / __ \|   |  \  ___/|  | \/
+/____  >\___  >____  >\___  >____  /___|  /\___  >__|   
+     \/     \/     \/     \/     \/     \/     \/       
+    Massive Status Code Scanner
+
+EOF
+# Check if curl is installed
 if ! command -v curl &> /dev/null
         then
         echo "Curl not installed. You must install curl to use this tool."
@@ -11,6 +30,7 @@ if ! command -v curl &> /dev/null
 fi
 
 # Variable
+datenow=$(date +'%m/%d/%Y %r')
 process=15 # Default multi-process
 useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
 
@@ -32,22 +52,22 @@ statuscode()
 {
     if [[ $saved == 1 ]]; then
         req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
-        if [[ $req == $filter ]]; then
+        if [[ $req == "$filter" ]]; then
             echo "[${req}] - $hostlists"
             echo $hostlists >> $req-$output
         fi
     else
-        if [ -z $filter ]; then
+        if [ -z "$filter" ]; then
             curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null $hostlists
         else
             req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
-            if [[ $req == $filter ]]; then
+            if [[ $req == "$filter" ]]; then
                 echo "[${req}] - $hostlists"
             fi
         fi
     fi
 }
-if [ -z "$1" ] || [[ ! $@ =~ ^\-.+ ]]; then
+if [ -z "$1" ] || [[ ! $1 =~ ^\-.+ ]]; then
     showHelp
     exit 0
 fi
@@ -85,10 +105,10 @@ if [ -z "$domainlists" ] || [ ! -f "$domainlists" ]; then
     echo "Please provide valid domain list file." >&2
     exit 1
 fi
-if [ -z $output ]; then
+if [ -z "$output" ]; then
     saved=0
 else
-    if [ -z $filter ]; then
+    if [ -z "$filter" ]; then
         echo 'if you using -o (output), -f is mandatory (filter)'
         exit 1
     else
@@ -96,13 +116,12 @@ else
     fi
 fi
 # Do the jobs
-while read hostlists; do
+echo -e "${bold}[${datenow}] - Program Start${reset}\n"
+while IFS= read -r hostlists; do
     statuscode $saved &
-    background=( $(jobs -p) )
-    if (( ${#background[@]} == process )); then
-        wait -n
+    if test "$(jobs | wc -l)" -ge "$process"; then
+      wait -n
     fi
 done < "$domainlists"
 wait
-
-echo  -e "\nAll jobs done. Thank you!"
+echo -e "\n${bold}[${datenow}] - Program End${reset}"
