@@ -36,10 +36,7 @@ bash scscanner.sh -l domain.txt -f 200 -o result.txt
 ```
 
 ## Screenshot
-![scscanner](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjm5oYqNvgE7vpUg2VNklMtLFIhzU0KF9c3hdAvVXNE4DOnkwkGdSZRl5g_YsjyeOenZvuy_FAw7GWcB23sk1MOTe-pzUgss7ZZguqYOpU-0eQFHgTsmdt7LMy5SAy_5B9AblvJvCecKXfsPSVzb6L8sBYzUUpFJFnett8CMjN9hkkru7tuRo_AJx_JhQ/s708/scscanner.png "scscanner")
-
-![scscanner filter](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjbAhYbQK55f4GMTAPtPNs2qminL5YEzj36k98d2nLz2YW2zdtaTqGovtDLCtpj8JNSyaMcDKqQOakxC4o3mVUVihaue8Q7e8hFkrkButog2eq9VnjPfMZi5nzt-jglVzZfs6wdeX1ZHK3oZmMlkAh3cBGQK-FgPFIWY8CxG9l6V1nCP_0cPjAymsTGHg/s708/scscanner%20saved%20result.png "scscanner filter result")
-
+![scscanner](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjcubqAFn-aUmLEmd9PAn58Z7WHgSRPAedx-cTP4UBlnnRV78fypFP-wmvLgqMg5mWdiBGjNf65eooNJxSTKerIdL_uNjMMjVYD01WpRZq0_dm5UE9kqDac2YGM7P0IDr-VF_KK2AM9xOUMU24h9amht-yN1mziDud6CcGRLEM29eFygdlvbjMSihfzwQ/s791/scscanner.png "scscanner")
 
 # To do List
 - [x] Add multi-processing
