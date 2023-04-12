@@ -1,127 +1,143 @@
 #!/bin/bash
 
 # Color definition
-blue="\033[0;34m"
-cyan="\033[0;36m"
-reset="\033[0m"
-red="\033[0;31m"
-green="\033[0;32m"
-orange="\033[0;33m"
-bold="\033[1m"
-b_green="\033[1;32m"
-b_red="\033[1;31m"
-b_orange="\033[1;33m"
+: "${blue:=\033[0;34m}"
+: "${cyan:=\033[0;36m}"
+: "${reset:=\033[0m}"
+: "${red:=\033[0;31m}"
+: "${green:=\033[0;32m}"
+: "${orange:=\033[0;33m}"
+: "${bold:=\033[1m}"
+: "${b_green:=\033[1;32m}"
+: "${b_red:=\033[1;31m}"
+: "${b_orange:=\033[1;33m}"
 
-#Banner   
-cat << "EOF"                                                   
-  ______ ____   ______ ____ _____    ____   ___________ 
- /  ___// ___\ /  ___// ___\\__  \  /    \_/ __ \_  __ \
- \___ \\  \___ \___ \\  \___ / __ \|   |  \  ___/|  | \/
-/____  >\___  >____  >\___  >____  /___|  /\___  >__|   
-     \/     \/     \/     \/     \/     \/     \/       
-    Massive Status Code Scanner
+
+# Banner
+while read -r banner; do
+	printf '%s\n' "$banner"
+done <<-"EOF"
+　  ______ ____   ______ ____ _____    ____   ___________ 
+　 /  ___// ___\ /  ___// ___\\__  \  /    \_/ __ \_  __ \
+　 \___ \\  \___ \___ \\  \___ / __ \|   |  \  ___/|  | \/
+　/____  >\___  >____  >\___  >____  /___|  /\___  >__|   
+　     \/     \/     \/     \/     \/     \/     \/       
+　　　　　    Massive Status Code Scanner
 
 EOF
+
 # Check if curl is installed
-if ! command -v curl &> /dev/null
-        then
-        echo "Curl not installed. You must install curl to use this tool."
-        exit 1
-fi
+command -v curl &> /dev/null || { printf '%s\n' "Curl not installed. You must install curl to use this tool." >&2 ; exit 1 ;}
 
 # Variable
-datenow=$(date +'%m/%d/%Y %r')
 process=15 # Default multi-process
 useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
 
 # Function
 showHelp()
 {
-   # Display Help
-   echo "Example: bash $0 -l domain.txt -t 30"
-   echo "options:"
-   echo "-l     File contain lists of domain."
-   echo "-t     Adjust multi process. Default is 15"
-   echo "-f     Filter status code."
-   echo "-o     Save to file."
-   echo "-h     Print this Help."
-   echo
+	while read -r help; do
+		printf '%s\n' "$help"
+	done <<-EOF
+	A Tool that read/checks website's HTTP response code from the lists.
+	
+	Usage:
+	　　$0 [-l <domain.txt>] [-t {int}] [-o <out.txt>]
+	　　$0 [-h]
+	
+	Options:
+	　　-l     File contain lists of domain.
+	　　-t     Adjust multi process. (Default: 15)
+	　　-f     Filter status code.
+	　　-o     Save to file.
+	　　-h     Print this Help.
+	EOF
 }
 
 statuscode()
 {
-    if [[ $saved == 1 ]]; then
-        req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
-        if [[ $req == "$filter" ]]; then
-            echo "[${req}] - $hostlists"
-            echo $hostlists >> $req-$output
-        fi
-    else
-        if [ -z "$filter" ]; then
-            curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null $hostlists
-        else
-            req=$(curl -H "User-Agent: $useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null $hostlists)
-            if [[ $req == "$filter" ]]; then
-                echo "[${req}] - $hostlists"
-            fi
-        fi
-    fi
+	if [[ "$1" == 1 ]]; then
+		req=$(curl -A "$useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "$2")
+		if [[ $req == "$3" ]]; then
+			printf '[%s] - %s\n' "${req}" "$2"
+			printf '%s\n' "$2" >> "$req-$4"
+		fi
+	else
+		if [[ -z "$3" ]]; then
+			curl -A "$useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null "$2"
+		else
+			req=$(curl -A "$useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "$2")
+			[[ "$req" == "$3" ]] || printf '[%s] - %s\n' "${req}" "$hostlists"
+		fi
+	fi
 }
-if [ -z "$1" ] || [[ ! $1 =~ ^\-.+ ]]; then
-    showHelp
-    exit 0
+
+if [[ -z "$1" ]] || [[ ! "$1" =~ ^\-.+ ]]; then
+	showHelp
+	exit 0
 fi
+
 while getopts ":hl:t:f:o:" opt; do
-    case $opt in
-        h)  showHelp
-            exit 0
-            ;;
-        l)  domainlists=$OPTARG
-            ;;
-        t)  if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
-            echo "Error: invalid thread value"
-            exit 1 # failure
-            fi
-            process=$OPTARG
-            ;;
-        f)  if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
-            echo "Error: invalid status code value"
-            exit 1 # failure
-            fi
-            filter=$OPTARG
-            ;;
-        o)  output=$OPTARG
-            ;;
-        \?) echo "invalid option: -$OPTARG"
-            exit 1
-            ;;
-        :)  echo "option -$OPTARG requires an argument."
-            exit 1
-            ;;
-    esac
+	case "$opt" in
+		h)
+			showHelp
+			exit 0
+			;;
+		l)
+			domainlists="$OPTARG"
+			;;
+		t)
+			if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
+				printf '%s\n' "Error: invalid thread value" >&2
+				exit 1 # failure
+			fi
+			process="$OPTARG"
+			;;
+		f)
+			if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
+				printf '%s\n' "Error: invalid status code value" >&2
+				exit 1 # failure
+			fi
+			filter="$OPTARG"
+			;;
+		o)
+			output="$OPTARG"
+			;;
+		\?)
+			printf 'invalid option: - %s\n' "$OPTARG" >&2
+			exit 1
+			;;
+		:)
+			printf 'option -%s requires an argument.\n' "$OPTARG" >&2
+			exit 1
+			;;
+	esac
 done
+
 shift "$((OPTIND-1))"
-if [ -z "$domainlists" ] || [ ! -f "$domainlists" ]; then
-    echo "Please provide valid domain list file." >&2
-    exit 1
+if [[ -z "$domainlists" ]] || [[ ! -f "$domainlists" ]]; then
+	printf '%s\n' "Please provide valid domain list file." >&2
+	exit 1
 fi
-if [ -z "$output" ]; then
-    saved=0
+if [[ -z "$output" ]]; then
+	saved=0
 else
-    if [ -z "$filter" ]; then
-        echo 'if you using -o (output), -f is mandatory (filter)'
-        exit 1
-    else
-        saved=1
-    fi
+	if [[ -z "$filter" ]]; then
+		printf '%s\n' "If you're using -o (output), -f is mandatory (filter)" >&2
+		exit 1
+	else
+		saved=1
+	fi
 fi
+
 # Do the jobs
-echo -e "${bold}[${datenow}] - Program Start${reset}\n"
+printf "${bold}[%s] - Program Started${reset}\n\n" "$(date +'%m/%d/%Y %r')"
 while IFS= read -r hostlists; do
-    statuscode $saved &
-    if test "$(jobs | wc -l)" -ge "$process"; then
-      wait -n
-    fi
-done < "$domainlists"
+	[[ -z "${hostlists}" ]] && continue
+	statuscode "$saved" "${hostlists/$'\r'/}" "$filter" "$output" &
+	if test "$(jobs | wc -l)" -ge "$process"; then
+		wait -n
+	fi
+done <<< "$(<"$domainlists")"
 wait
-echo -e "\n${bold}[${datenow}] - Program End${reset}"
+printf "\n${bold}[%s] - Program Ends${reset}\n" "$(date +'%m/%d/%Y %r')"
