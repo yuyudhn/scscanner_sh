@@ -8,16 +8,21 @@ scscanner is tool to read website status code response from the lists. This tool
 
 ## Usage
 ```
-┌──(miku㉿nakano)-[~/scscanner]
-└─$ bash scscanner.sh
+➜  scscanner_sh git:(main) ✗ bash scscanner.sh 
 
-scscanner - Massive Status Code Scanner
-Codename : EVA02
+█▀ █▀▀ █▀ █▀▀ ▄▀█ █▄░█ █▄░█ █▀▀ █▀█
+▄█ █▄▄ ▄█ █▄▄ █▀█ █░▀█ █░▀█ ██▄ █▀▄
+Massive Status Code Scanner
 
-Example: bash scscanner.sh -l domain.txt -t 30
-options:
--l     Files contain lists of domain.
--t     Adjust multi process. Default is 15
+A Tool that read/checks website's HTTP response code from the lists.
+
+Usage:
+scscanner.sh [-l <domain.txt>] [-t {int}] [-o <out.txt>]
+scscanner.sh [-h]
+
+Options:
+-l     File contain lists of domain.
+-t     Adjust multi process. (Default: 15)
 -f     Filter status code.
 -o     Save to file.
 -h     Print this Help.
@@ -36,7 +41,7 @@ bash scscanner.sh -l domain.txt -f 200 -o result.txt
 ```
 
 ## Screenshot
-![scscanner](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjcubqAFn-aUmLEmd9PAn58Z7WHgSRPAedx-cTP4UBlnnRV78fypFP-wmvLgqMg5mWdiBGjNf65eooNJxSTKerIdL_uNjMMjVYD01WpRZq0_dm5UE9kqDac2YGM7P0IDr-VF_KK2AM9xOUMU24h9amht-yN1mziDud6CcGRLEM29eFygdlvbjMSihfzwQ/s791/scscanner.png "scscanner")
+![scscanner](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYfMo4fSWBtsIyRAiF3IBJ9yZxkPnMAsqB8-xap665fIboPuDUMGKMwVcYFfPrwCpDVPbk3fZcY9VhWIKCL1j0haNm0L70G4kiKQ9vYPAYeexNy8Zs9wg_zLbzhBhO2a5HNq186r1DI9XCWgJ1L1w2dgUZGC_UIAZz9w1rv_UogYPQaLe6EAtdoCr5Hg/s800/scscanner_sh.png "scscanner")
 
 # To do List
 - [x] Add multi-processing
