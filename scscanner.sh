@@ -17,12 +17,10 @@
 while read -r banner; do
 	printf '%s\n' "$banner"
 done <<-"EOF"
-　  ______ ____   ______ ____ _____    ____   ___________ 
-　 /  ___// ___\ /  ___// ___\\__  \  /    \_/ __ \_  __ \
-　 \___ \\  \___ \___ \\  \___ / __ \|   |  \  ___/|  | \/
-　/____  >\___  >____  >\___  >____  /___|  /\___  >__|   
-　     \/     \/     \/     \/     \/     \/     \/       
-　　　　　    Massive Status Code Scanner
+
+█▀ █▀▀ █▀ █▀▀ ▄▀█ █▄░█ █▄░█ █▀▀ █▀█
+▄█ █▄▄ ▄█ █▄▄ █▀█ █░▀█ █░▀█ ██▄ █▀▄
+Massive Status Code Scanner
 
 EOF
 
@@ -42,15 +40,15 @@ showHelp()
 	A Tool that read/checks website's HTTP response code from the lists.
 	
 	Usage:
-	　　$0 [-l <domain.txt>] [-t {int}] [-o <out.txt>]
-	　　$0 [-h]
+		$0 [-l <domain.txt>] [-t {int}] [-o <out.txt>]
+		$0 [-h]
 	
 	Options:
-	　　-l     File contain lists of domain.
-	　　-t     Adjust multi process. (Default: 15)
-	　　-f     Filter status code.
-	　　-o     Save to file.
-	　　-h     Print this Help.
+		-l     File contain lists of domain.
+		-t     Adjust multi process. (Default: 15)
+		-f     Filter status code.
+		-o     Save to file.
+		-h     Print this Help.
 	EOF
 }
 
