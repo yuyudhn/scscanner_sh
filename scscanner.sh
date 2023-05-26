@@ -15,12 +15,12 @@
 
 # Banner
 while read -r banner; do
-	printf '%s\n' "$banner"
+	printf '%s\n' "${banner}"
 done <<-"EOF"
 
-█▀ █▀▀ █▀ █▀▀ ▄▀█ █▄░█ █▄░█ █▀▀ █▀█
-▄█ █▄▄ ▄█ █▄▄ █▀█ █░▀█ █░▀█ ██▄ █▀▄
-Massive Status Code Scanner
+　█▀ █▀▀ █▀ █▀▀ ▄▀█ █▄░█ █▄░█ █▀▀ █▀█
+　▄█ █▄▄ ▄█ █▄▄ █▀█ █░▀█ █░▀█ ██▄ █▀▄
+　　　Massive Status Code Scanner
 
 EOF
 
@@ -35,92 +35,96 @@ useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, 
 showHelp()
 {
 	while read -r help; do
-		printf '%s\n' "$help"
+		printf '%s\n' "${help}"
 	done <<-EOF
 	A Tool that read/checks website's HTTP response code from the lists.
 	
 	Usage:
-		$0 [-l <domain.txt>] [-t {int}] [-o <out.txt>]
-		$0 [-h]
+	　　${0} [-l <domain.txt>] [-t {int}] [-o <out.txt>]
+	　　${0} [-h]
 	
 	Options:
-		-l     File contain lists of domain.
-		-t     Adjust multi process. (Default: 15)
-		-f     Filter status code.
-		-o     Save to file.
-		-h     Print this Help.
+	　　-l     File contain lists of domain.
+	　　-t     Adjust multi process. (Default: 15)
+	　　-f     Filter status code.
+	　　-o     Save to file.
+	　　-h     Print this Help.
 	EOF
 }
 
 statuscode()
 {
-	if [[ "$1" == 1 ]]; then
-		req=$(curl -A "$useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "$2")
+	if [[ "${1}" == 1 ]]; then
+		req=$(curl -A "${useragent}" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "${2}")
 		if [[ $req == "$3" ]]; then
-			printf '[%s] - %s\n' "${req}" "$2"
-			printf '%s\n' "$2" >> "$req-$4"
+			printf '[%s] - %s\n' "${req}" "${2}"
+			printf '%s\n' "${2}" >> "${req}-${4}"
 		fi
 	else
 		if [[ -z "$3" ]]; then
-			curl -A "$useragent" --connect-timeout 3 --write-out "[%{http_code}] - $hostlists\n" --silent --output /dev/null "$2"
+			curl -A "${useragent}" --connect-timeout 3 --write-out "[%{http_code}] - ${hostlists}\n" --silent --output /dev/null "${2}"
 		else
-			req=$(curl -A "$useragent" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "$2")
-			[[ "$req" == "$3" ]] || printf '[%s] - %s\n' "${req}" "$hostlists"
+			req=$(curl -A "${useragent}" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "${2}")
+			[[ "${req}" == "${3}" ]] && printf '[%s] - %s\n' "${req}" "${hostlists}"
 		fi
 	fi
 }
 
-if [[ -z "$1" ]] || [[ ! "$1" =~ ^\-.+ ]]; then
+if [[ -z "${1}" ]]; then
 	showHelp
 	exit 0
 fi
 
 while getopts ":hl:t:f:o:" opt; do
-	case "$opt" in
+	case "${opt}" in
 		h)
 			showHelp
 			exit 0
 			;;
 		l)
-			domainlists="$OPTARG"
+			domainlists="${OPTARG}"
 			;;
 		t)
-			if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
-				printf '%s\n' "Error: invalid thread value" >&2
+			proc_limit="$(ulimit -u)"
+			if ! [[ "${OPTARG}" =~ ^[0-9]+$ ]] || [[ "${OPTARG}" -gt "${proc_limit}" ]] || [[ "${OPTARG}" -le 0 ]] ; then
+				printf '%s\n' "Error: invalid thread value, the possible value must be (1-${proc_limit})" >&2
 				exit 1 # failure
 			fi
-			process="$OPTARG"
+			process="${OPTARG}"
 			;;
 		f)
-			if ! [[ "$OPTARG" =~ ^[0-9]+$ && "$OPTARG" -gt 0 ]]; then
+			if ! [[ "${OPTARG}" =~ ^[1-5][0-9]{2}$ ]]; then
 				printf '%s\n' "Error: invalid status code value" >&2
 				exit 1 # failure
 			fi
-			filter="$OPTARG"
+			filter="${OPTARG}"
 			;;
 		o)
-			output="$OPTARG"
+			output="${OPTARG}"
 			;;
 		\?)
-			printf 'invalid option: - %s\n' "$OPTARG" >&2
+			printf 'invalid option: - %s\n' "${OPTARG}" >&2
 			exit 1
 			;;
 		:)
-			printf 'option -%s requires an argument.\n' "$OPTARG" >&2
+			printf 'option -%s requires an argument.\n' "${OPTARG}" >&2
 			exit 1
 			;;
 	esac
 done
 
 shift "$((OPTIND-1))"
-if [[ -z "$domainlists" ]] || [[ ! -f "$domainlists" ]]; then
+: "${domainlists:="${1}"}"
+
+
+if [[ -z "${domainlists}" ]] || [[ ! -f "${domainlists}" ]]; then
 	printf '%s\n' "Please provide valid domain list file." >&2
 	exit 1
 fi
-if [[ -z "$output" ]]; then
+if [[ -z "${output}" ]]; then
 	saved=0
 else
-	if [[ -z "$filter" ]]; then
+	if [[ -z "${filter}" ]]; then
 		printf '%s\n' "If you're using -o (output), -f is mandatory (filter)" >&2
 		exit 1
 	else
@@ -132,10 +136,8 @@ fi
 printf "${bold}[%s] - Program Started${reset}\n\n" "$(date +'%m/%d/%Y %r')"
 while IFS= read -r hostlists; do
 	[[ -z "${hostlists}" ]] && continue
-	statuscode "$saved" "${hostlists/$'\r'/}" "$filter" "$output" &
-	if test "$(jobs | wc -l)" -ge "$process"; then
-		wait -n
-	fi
-done <<< "$(<"$domainlists")"
+	statuscode "${saved}" "${hostlists/$'\r'/}" "${filter}" "${output}" &
+	[[ "$(jobs | wc -l)" -ge "${process}" ]] && wait -n
+done <<< "$(<"${domainlists}")"
 wait
 printf "\n${bold}[%s] - Program Ends${reset}\n" "$(date +'%m/%d/%Y %r')"
