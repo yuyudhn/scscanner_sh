@@ -14,16 +14,11 @@
 
 
 # Banner
-while read -r banner; do
-	printf '%s\n' "${banner}"
-done <<-"EOF"
-
-　█▀ █▀▀ █▀ █▀▀ ▄▀█ █▄░█ █▄░█ █▀▀ █▀█
-　▄█ █▄▄ ▄█ █▄▄ █▀█ █░▀█ █░▀█ ██▄ █▀▄
-　　　Massive Status Code Scanner
-
-EOF
-
+echo " ___ __ ___ __ __ _ _ _  _ _  ___ _ _  ";
+echo "(_-</ _(_-</ _/ _\` | ' \| ' \/ -_) '_|";
+echo "/__/\__/__/\__\__,_|_||_|_||_\___|_|   ";
+echo "      Massive HTTP Status Code Scanner ";
+echo "";
 # Check if curl is installed
 command -v curl &> /dev/null || { printf '%s\n' "Curl not installed. You must install curl to use this tool." >&2 ; exit 1 ;}
 
@@ -37,34 +32,34 @@ showHelp()
 	while read -r help; do
 		printf '%s\n' "${help}"
 	done <<-EOF
-	A Tool that read/checks website's HTTP response code from the lists.
 	
+	A Tool that read/checks website's HTTP response code from the lists.
 	Usage:
-	　　${0} [-l <domain.txt>] [-t {int}] [-o <out.txt>]
-	　　${0} [-h]
+		${0} [-l <domain.txt>] [-t {int}] [-o <out.txt>]
+		${0} [-h]
 	
 	Options:
-	　　-l     File contain lists of domain.
-	　　-t     Adjust multi process. (Default: 15)
-	　　-f     Filter status code.
-	　　-o     Save to file.
-	　　-h     Print this Help.
+		-l     File contain lists of domain.
+		-t     Adjust multi process. (Default: 15)
+		-f     Filter status code.
+		-o     Save to file.
+		-h     Print this Help.
 	EOF
 }
 
 statuscode()
 {
 	if [[ "${1}" == 1 ]]; then
-		req=$(curl -A "${useragent}" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "${2}")
+		req=$(curl -k -A "${useragent}" --connect-timeout 10 --write-out "%{http_code}" --silent --output /dev/null "${2}")
 		if [[ $req == "$3" ]]; then
 			printf '[%s] - %s\n' "${req}" "${2}"
 			printf '%s\n' "${2}" >> "${req}-${4}"
 		fi
 	else
 		if [[ -z "$3" ]]; then
-			curl -A "${useragent}" --connect-timeout 3 --write-out "[%{http_code}] - ${hostlists}\n" --silent --output /dev/null "${2}"
+			curl -k -A "${useragent}" --connect-timeout 10 --write-out "[%{http_code}] - ${hostlists}\n" --silent --output /dev/null "${2}"
 		else
-			req=$(curl -A "${useragent}" --connect-timeout 3 --write-out "%{http_code}" --silent --output /dev/null "${2}")
+			req=$(curl -k -A "${useragent}" --connect-timeout 10 --write-out "%{http_code}" --silent --output /dev/null "${2}")
 			[[ "${req}" == "${3}" ]] && printf '[%s] - %s\n' "${req}" "${hostlists}"
 		fi
 	fi
@@ -133,11 +128,9 @@ else
 fi
 
 # Do the jobs
-printf "${bold}[%s] - Program Started${reset}\n\n" "$(date +'%m/%d/%Y %r')"
 while IFS= read -r hostlists; do
 	[[ -z "${hostlists}" ]] && continue
 	statuscode "${saved}" "${hostlists/$'\r'/}" "${filter}" "${output}" &
 	[[ "$(jobs | wc -l)" -ge "${process}" ]] && wait -n
 done <<< "$(<"${domainlists}")"
 wait
-printf "\n${bold}[%s] - Program Ends${reset}\n" "$(date +'%m/%d/%Y %r')"

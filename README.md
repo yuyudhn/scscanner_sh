@@ -8,14 +8,13 @@ scscanner is tool to read website status code response from the lists. This tool
 
 ## Usage
 ```
-➜  scscanner_sh git:(main) ✗ bash scscanner.sh 
-
-█▀ █▀▀ █▀ █▀▀ ▄▀█ █▄░█ █▄░█ █▀▀ █▀█
-▄█ █▄▄ ▄█ █▄▄ █▀█ █░▀█ █░▀█ ██▄ █▀▄
-Massive Status Code Scanner
+➜  scscanner_sh git:(main) ✗ bash scscanner.sh
+ ___ __ ___ __ __ _ _ _  _ _  ___ _ _  
+(_-</ _(_-</ _/ _` | ' \| ' \/ -_) '_|
+/__/\__/__/\__\__,_|_||_|_||_\___|_|   
+      Massive HTTP Status Code Scanner 
 
 A Tool that read/checks website's HTTP response code from the lists.
-
 Usage:
 scscanner.sh [-l <domain.txt>] [-t {int}] [-o <out.txt>]
 scscanner.sh [-h]
